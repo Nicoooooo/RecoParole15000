@@ -2,10 +2,10 @@ import math
 
 def levenshtein(seq1, seq2):
     oneago = None
-    thisrow = range(1, len(seq2) + 1) + [0]
-    for x in xrange(len(seq1)):
+    thisrow = list(range(1, len(seq2) + 1)) + [0]
+    for x in range(len(seq1)):
         twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
-        for y in xrange(len(seq2)):
+        for y in range(len(seq2)):
             delcost = oneago[y] + 1
             addcost = thisrow[y - 1] + 1
             subcost = oneago[y - 1] + (seq1[x] != seq2[y])
@@ -20,7 +20,7 @@ def tester_mot(mot, fileUrl) :
         splt = line.replace("\n", " ").split("\t")
         phonetique = (splt[1]).strip().split(" ")
 
-        print splt[0] + " [" + splt[1] + "] => " + str(levenshtein(m, phonetique))
+        print(splt[0] + " [" + splt[1] + "] => " + str(levenshtein(m, phonetique)))
 
 
 tester_mot(" f R u", "data/lexicon-1syll-0100words.lex")
