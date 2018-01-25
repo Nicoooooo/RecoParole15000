@@ -1,5 +1,3 @@
-import math
-
 def levenshtein(seq1, seq2):
     oneago = None
     thisrow = list(range(1, len(seq2) + 1)) + [0]
