@@ -1,3 +1,10 @@
+from collections import defaultdict
+
+psub = 0
+pins = 0
+pomi = 0
+matrix = defaultdict(dict)
+
 def levenshtein(seq1, seq2):
     oneago = None
     thisrow = list(range(1, len(seq2) + 1)) + [0]
@@ -21,4 +28,21 @@ def tester_mot(mot, fileUrl) :
         print(splt[0] + " [" + splt[1] + "] => " + str(levenshtein(m, phonetique)))
 
 
-tester_mot(" f R u", "data/lexicon-1syll-0100words.lex")
+def ouvrir_HMM(hmm):
+    file = open(hmm, "r")
+    file.readline()
+    line = file.readline().split(";")
+    psub = float(line[0])
+    pins = float(line[1])
+    pomi = float(line[2])
+    file.readline()
+    indices = file.readline().replace("\n", "").split(";")
+
+    for i in range(34):
+        line = file.readline().replace("\n", "").split(";")
+        print(line)
+        for j in range(33):
+            matrix[line[0]][indices[j+1]] = float(line[j+1])
+
+
+ouvrir_HMM("data/modele_discret_initialise.dat")
