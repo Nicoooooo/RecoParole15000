@@ -48,10 +48,10 @@ def recuperer_meilleur_match(motReel, mot, fileUrl):
             motTrouvePhonetique = splt[1]
 
     if motTrouve == motReel or motTrouve + 's' == motReel or motTrouve == motReel + 's':
-        print("  - " + motReel + " [" + mot + "] => " + motTrouve + " [" + motTrouvePhonetique + "] CORRECT (d=" + str(mini) + ") " + alignement(motReel, motTrouve))
+        print("  - " + motReel + " [" + mot + "] => " + motTrouve + " [" + motTrouvePhonetique + "] CORRECT (d=" + str(mini) + ") ")
         return 0
     else:
-        print(colored("  - " + motReel + " [" + mot + "] => " + motTrouve + " [" + motTrouvePhonetique + "] ERREUR (d=" + str(mini) + ") " + alignement(motReel, motTrouve), 'red', attrs=['bold']))
+        print(colored("  - " + motReel + " [" + mot + "] => " + motTrouve + " [" + motTrouvePhonetique + "] ERREUR (d=" + str(mini) + ") " + alignement(mot, motTrouvePhonetique), 'red', attrs=['bold']))
         return 1
 
 def tester_lexique(lexiqueUrl, testUrl):
