@@ -13,6 +13,30 @@ def init():
         for j in range(len(indices)):
             matrix[indices[i]][indices[j]] = 0
 
+def alignment(seq1, seq2):
+    res = ""
+
+    while len(seq1) < len(seq2):
+        seq1 = seq1 + " "
+    while len(seq2) < len(seq1):
+        seq2 = seq2 + " "
+
+    for x in range(len(seq1)):
+        if seq1[x] != " ":
+            res = res + "(" + seq1[x] + "=>" + seq2[x] + ") "
+    return res
+
+
+def apprentissage(app):
+    with open(app, 'r') as f:
+        for line in f:
+            elem = line.replace("\n", "").replace("[","").replace("]","").replace(" ","").split("\t")
+            ali = alignment(elem[1], elem[2])
+            print(ali)
+        else:
+            print("end")
+
+
 
 def enregistrer_HMM(hmm):
     global psub, pins, pomi, matrix, indices, insertion
@@ -39,4 +63,5 @@ def enregistrer_HMM(hmm):
     file.write("\n")
 
 init()
+apprentissage("data/train-01000items.train")
 enregistrer_HMM("iter1.dat")
