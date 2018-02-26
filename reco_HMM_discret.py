@@ -29,6 +29,7 @@ def tester_mot(mot, fileUrl) :
 
 
 def ouvrir_HMM(hmm):
+    global psub, pins, pomi, matrix
     file = open(hmm, "r")
     file.readline()
     line = file.readline().split(";")
@@ -40,9 +41,9 @@ def ouvrir_HMM(hmm):
 
     for i in range(34):
         line = file.readline().replace("\n", "").split(";")
-        print(line)
         for j in range(33):
             matrix[line[0]][indices[j+1]] = float(line[j+1])
 
 
 ouvrir_HMM("data/modele_discret_initialise.dat")
+print(matrix)
