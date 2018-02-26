@@ -1,4 +1,5 @@
 import sys
+import difflib
 from termcolor import colored, cprint
 
 # text = colored('Hello, World!', 'red', attrs=['reverse', 'blink'])
@@ -20,15 +21,36 @@ def levenshtein(seq1, seq2):
 
 def alignment(seq1, seq2):
     res = ""
+    sub = ""
+    last = ""
 
-    while len(seq1) < len(seq2):
-        seq1 = seq1 + " "
-    while len(seq2) < len(seq1):
-        seq2 = seq2 + " "
+    for i,s in enumerate(difflib.ndiff(seq1, seq2)):
+        if s[-1] != ' ' and s[-1] != '':
+            if s[0] == ' ':
+                res += '({} => {}) '.format(s[-1],s[-1])
+            elif s[0] == '-':
+                if last == '+': # substitution
+                    res += '({} => {}) '.format(sub,s[-1])
+                    last = ""
+                elif last == '-': # sortie valeur précédente
+                    res += '({} => \"\") '.format(sub,sub)
+                    last = '-'
+                    sub = s[-1]
+                else: # en mémoire
+                    last = '-'
+                    sub = s[-1]
+            elif s[0]=='+':
+                if last == '+': # sortie valeur précédente
+                    res += '(\"\" => {}) '.format(sub,sub)
+                    last = '+'
+                    sub = s[-1]
+                elif last == '-': # substitution
+                    res += '({} => {}) '.format(sub,s[-1])
+                    last = ""
+                else: # en mémoire
+                    last = '+'
+                    sub = s[-1]
 
-    for x in range(len(seq1)):
-        if seq1[x] != " ":
-            res = res + "(" + seq1[x] + "=>" + seq2[x] + ") "
     return res
 
 
@@ -50,7 +72,7 @@ def best_match(motReel, mot, fileUrl):
             motTrouvePhonetique = splt[1]
 
     if motTrouve == motReel or motTrouve + 's' == motReel or motTrouve == motReel + 's':
-        print("  - " + motReel + " [" + mot + "] => " + motTrouve + " [" + motTrouvePhonetique + "] CORRECT (d=" + str(mini) + ") ")
+        print("  - " + motReel + " [" + mot + "] => " + motTrouve + " [" + motTrouvePhonetique + "] CORRECT (d=" + str(mini) + ") " + alignment(mot, motTrouvePhonetique))
         return 0
     else:
         print(colored("  - " + motReel + " [" + mot + "] => " + motTrouve + " [" + motTrouvePhonetique + "] ERREUR (d=" + str(mini) + ") " + alignment(mot, motTrouvePhonetique), 'red', attrs=['bold']))
