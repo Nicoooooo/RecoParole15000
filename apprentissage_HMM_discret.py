@@ -67,7 +67,7 @@ def alignment(seq1, seq2):
             elif s[0] == '-':
                 if last == '+': # substitution
                     res += '({} => {}) '.format(sub,s[-1])
-                    # matrix[i-1][i] = matrix[i-1][i] + 1
+                    # matrix[indices[i-1]][indices[i]] += 1
                     psub += 1
                     last = ""
                 elif last == '-': # sortie valeur précédente
@@ -84,11 +84,11 @@ def alignment(seq1, seq2):
                     last = '+'
                     sub = s[-1]
                     pins += 1
-                    # insertion[i] = (insertion[i] + 1)
+                    # insertion[indices[i]] = (insertion[indices[i]] + 1)
                 elif last == '-': # substitution
                     res += '({} => {}) '.format(sub,s[-1])
                     last = ""
-                    # matrix[i][i-1] += matrix[i][i-1] + 1
+                    # matrix[indices[i]][indices[i-1]] += 1
                     psub += 1
                 else: # en mémoire
                     last = '+'
