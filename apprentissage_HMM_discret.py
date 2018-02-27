@@ -67,11 +67,14 @@ def alignment(seq1, seq2):
             elif s[0] == '-':
                 if last == '+': # substitution
                     res += '({} => {}) '.format(sub,s[-1])
+                    # matrix[i-1][i] = matrix[i-1][i] + 1
+                    psub += 1
                     last = ""
                 elif last == '-': # sortie valeur précédente
                     res += '({} => \"\") '.format(sub,sub)
                     last = '-'
                     sub = s[-1]
+                    pomi += 1
                 else: # en mémoire
                     last = '-'
                     sub = s[-1]
@@ -80,15 +83,18 @@ def alignment(seq1, seq2):
                     res += '(\"\" => {}) '.format(sub,sub)
                     last = '+'
                     sub = s[-1]
+                    pins += 1
+                    # insertion[i] = (insertion[i] + 1)
                 elif last == '-': # substitution
                     res += '({} => {}) '.format(sub,s[-1])
                     last = ""
+                    # matrix[i][i-1] += matrix[i][i-1] + 1
+                    psub += 1
                 else: # en mémoire
                     last = '+'
                     sub = s[-1]
 
     return res
-
 
 init()
 apprentissage("data/train-01000items.train")
