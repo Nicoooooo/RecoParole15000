@@ -19,14 +19,26 @@ def init():
             matrix[indices[i]][indices[j]] = 0
 
 def apprentissage(app):
+    global psub, pins, pomi, matrix, insertion
     with open(app, 'r') as f:
         for line in f:
             elem = line.replace("\n", "").replace("[","").replace("]","").replace(" ","").split("\t")
-            ali = alignment(elem[1], elem[2])
-            print(ali)
+            alignment(elem[2], elem[1])
         else:
-            print("end")
-
+            nchgt = psub + pins + pomi
+            psub = (psub +1)/(nchgt +3)
+            pins = (pins +1)/(nchgt +3)
+            pomi = (pomi +1)/(nchgt +3)
+            totalIns = 0
+            for i in range (len(indices)):
+                total = 0
+                totalIns += insertion[indices[i]] + 1
+                for j in range(len(indices)):
+                    total += matrix[indices[i]][indices[j]] + 1
+                for j in range(len(indices)):
+                    matrix[indices[i]][indices[j]] = (matrix[indices[i]][indices[j]]+1) / total
+            for i in range (len(indices)):
+                insertion[indices[i]] = (insertion[indices[i]] + 1)/totalIns
 
 
 def enregistrer_HMM(hmm):
@@ -50,7 +62,7 @@ def enregistrer_HMM(hmm):
     file.write("Proba insertions...\n")
     file.write("<ins>")
     for i in range (len(insertion)):
-        file.write(';'+str('%.3f' % insertion[i]))
+        file.write(';'+str('%.3f' % insertion[indices[i]]))
     file.write("\n")
 
 def alignment(seq1, seq2):
@@ -61,13 +73,14 @@ def alignment(seq1, seq2):
     last = ""
 
     for i,s in enumerate(difflib.ndiff(seq1, seq2)):
-        if s[-1] != ' ' and s[-1] != '':
+        if s[-1] != ' ' and s[-1] != '~' and s[-1] != '':
             if s[0] == ' ':
                 res += '({} => {}) '.format(s[-1],s[-1])
+                matrix[s[-1]][s[-1]] += 1
             elif s[0] == '-':
                 if last == '+': # substitution
                     res += '({} => {}) '.format(sub,s[-1])
-                    matrix[indices[i-1]][indices[i]] += 1
+                    matrix[sub][s[-1]] += 1
                     psub += 1
                     last = ""
                 elif last == '-': # sortie valeur précédente
@@ -84,11 +97,11 @@ def alignment(seq1, seq2):
                     last = '+'
                     sub = s[-1]
                     pins += 1
-                    insertion[indices[i]] = (insertion[indices[i]] + 1)
+                    insertion[sub] += 1
                 elif last == '-': # substitution
                     res += '({} => {}) '.format(sub,s[-1])
                     last = ""
-                    matrix[indices[i]][indices[i-1]] += 1
+                    matrix[sub][s[-1]] += 1
                     psub += 1
                 else: # en mémoire
                     last = '+'
@@ -98,4 +111,4 @@ def alignment(seq1, seq2):
 
 init()
 apprentissage("data/train-01000items.train")
-#enregistrer_HMM("iter1.dat")
+enregistrer_HMM("iter1.dat")

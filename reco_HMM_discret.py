@@ -42,8 +42,12 @@ def levenshtein(seq1, seq2):
         twoago, oneago, thisrow = oneago, thisrow, [0] * len(seq2) + [x + 1]
         for y in range(len(seq2)):
             delcost = oneago[y] - math.log(pomi)
-            addcost = thisrow[y - 1] - math.log(pins) - math.log(float(insertion[seq1[x]]))
-            subcost = oneago[y - 1] - math.log(psub) - math.log(float(matrix[seq1[x]][seq2[y]]))
+            if(seq1[x] != '' and seq2[y] != ''):
+                addcost = thisrow[y - 1] - math.log(pins) - math.log(float(insertion[seq2[y]]))
+                subcost = oneago[y - 1] - math.log(psub) - math.log(float(matrix[seq2[y]][seq1[x]]))
+            else:
+                addcost = thisrow[y - 1] - math.log(pins)
+                subcost = oneago[y - 1] - math.log(psub)
             thisrow[y] = min(delcost, addcost, subcost)
     return thisrow[len(seq2) - 1]
 
@@ -125,5 +129,5 @@ def test_lexicon(lexiqueUrl, testUrl):
     print("Résultats : " + str(cnt - err) + "/" + str(cnt) + " bons résultats (" + str( round(((cnt-err)/cnt)*100) ) + "%)")
 
 
-ouvrir_HMM("data/modele_discret_initialise.dat")
+ouvrir_HMM("iter1.dat")
 test_lexicon("data/test-3syll-0100words.test", "data/lexicon-3syll-0500words.lex")
