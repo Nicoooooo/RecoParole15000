@@ -1,31 +1,22 @@
 from collections import defaultdict
+import difflib
 
 psub = 0.0
 pins = 0.0
 pomi = 0.0
 matrix = defaultdict(dict)
 indices = ["2","9","@","e","E","o","O","a","i","u","y","a~","o~","e~","H","w","j","R","l","p","t","k","b","d","g","f","s","S","v","z","Z","m","n","J"]
-insertion = [0]*len(indices)
+insertion = defaultdict(dict)
 
 def init():
-    global matrix
+    global psub, pins, pomi, matrix, insertion
+    psub = 0.0
+    pins = 0.0
+    pomi = 0.0
     for i in range (len(indices)):
+        insertion[indices[i]] = 0
         for j in range(len(indices)):
             matrix[indices[i]][indices[j]] = 0
-
-def alignment(seq1, seq2):
-    res = ""
-
-    while len(seq1) < len(seq2):
-        seq1 = seq1 + " "
-    while len(seq2) < len(seq1):
-        seq2 = seq2 + " "
-
-    for x in range(len(seq1)):
-        if seq1[x] != " ":
-            res = res + "(" + seq1[x] + "=>" + seq2[x] + ") "
-    return res
-
 
 def apprentissage(app):
     with open(app, 'r') as f:
@@ -61,6 +52,43 @@ def enregistrer_HMM(hmm):
     for i in range (len(insertion)):
         file.write(';'+str('%.3f' % insertion[i]))
     file.write("\n")
+
+def alignment(seq1, seq2):
+    global psub, pins, pomi, matrix, insertion
+
+    res = ""
+    sub = ""
+    last = ""
+
+    for i,s in enumerate(difflib.ndiff(seq1, seq2)):
+        if s[-1] != ' ' and s[-1] != '':
+            if s[0] == ' ':
+                res += '({} => {}) '.format(s[-1],s[-1])
+            elif s[0] == '-':
+                if last == '+': # substitution
+                    res += '({} => {}) '.format(sub,s[-1])
+                    last = ""
+                elif last == '-': # sortie valeur précédente
+                    res += '({} => \"\") '.format(sub,sub)
+                    last = '-'
+                    sub = s[-1]
+                else: # en mémoire
+                    last = '-'
+                    sub = s[-1]
+            elif s[0]=='+':
+                if last == '+': # sortie valeur précédente
+                    res += '(\"\" => {}) '.format(sub,sub)
+                    last = '+'
+                    sub = s[-1]
+                elif last == '-': # substitution
+                    res += '({} => {}) '.format(sub,s[-1])
+                    last = ""
+                else: # en mémoire
+                    last = '+'
+                    sub = s[-1]
+
+    return res
+
 
 init()
 apprentissage("data/train-01000items.train")
